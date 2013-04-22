@@ -15,8 +15,12 @@
  */
 package me.entityreborn.chplotme;
 
+import com.laytonsmith.abstraction.MCLocation;
+import com.laytonsmith.abstraction.MCPlayer;
 import com.laytonsmith.annotations.api;
 import com.laytonsmith.core.CHVersion;
+import com.laytonsmith.core.ObjectGenerator;
+import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.CArray;
 import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.Construct;
@@ -30,6 +34,7 @@ import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 import com.worldcretornica.plotme.PlotMe;
 import java.util.HashMap;
+import org.bukkit.Location;
 
 /**
  *
@@ -129,6 +134,61 @@ public class CHPlotMe {
         
         public String docs() {
             return "array {world} Get the plot ids for a given world.";
+        }
+        
+        public CHVersion since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_loc extends AbstractFunction {
+        
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+        
+        public boolean isRestricted() {
+            return true;
+        }
+        
+        public Boolean runAsync() {
+            return false;
+        }
+        
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            MCLocation loc;
+            
+            if (args.length == 0) {
+                MCPlayer p = environment.getEnv(CommandHelperEnvironment.class).GetPlayer();
+                loc = p.getLocation();
+            } else {
+                if (args[0] instanceof CString) {
+                    MCPlayer p = Static.GetPlayer(args[0].val(), t);
+                    loc = p.getLocation();
+                } else if (args[0] instanceof CArray) {
+                    CArray arr = (CArray)args[0];
+                    loc = ObjectGenerator.GetGenerator().location(arr, null, t);
+                } else {
+                    throw new ConfigRuntimeException("Invalid argument.", Exceptions.ExceptionType.FormatException, t);
+                }
+            }
+            
+            String id = PlotManager.getPlotId((Location)loc.getHandle());
+            
+            return new CString(id, t);
+        }
+        
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+        
+        public Integer[] numArgs() {
+            return new Integer[]{1};
+        }
+        
+        public String docs() {
+            return "string {[location]} Get the plots id for a given location.";
         }
         
         public CHVersion since() {
