@@ -15,6 +15,7 @@
  */
 package me.entityreborn.chplotme;
 
+import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCLocation;
 import com.laytonsmith.abstraction.MCPlayer;
 import com.laytonsmith.annotations.api;
@@ -22,6 +23,10 @@ import com.laytonsmith.core.CHVersion;
 import com.laytonsmith.core.ObjectGenerator;
 import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.CArray;
+import com.laytonsmith.core.constructs.CBoolean;
+import com.laytonsmith.core.constructs.CDouble;
+import com.laytonsmith.core.constructs.CInt;
+import com.laytonsmith.core.constructs.CNull;
 import com.laytonsmith.core.constructs.CString;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
@@ -32,6 +37,7 @@ import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.functions.Exceptions;
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
+import com.worldcretornica.plotme.PlotMapInfo;
 import com.worldcretornica.plotme.PlotMe;
 import java.util.HashMap;
 import org.bukkit.Location;
@@ -43,7 +49,7 @@ import org.bukkit.Location;
 public class CHPlotMe {
 
     @api(environments = {CommandHelperEnvironment.class})
-    public static class get_plot_owner extends AbstractFunction {
+    public static class plot_owner extends AbstractFunction {
 
         public Exceptions.ExceptionType[] thrown() {
             return null;
@@ -71,7 +77,7 @@ public class CHPlotMe {
                 return new CString(plot.getOwner(), t);
             }
 
-            throw new ConfigRuntimeException(PlotMe.caption("MsgNoPlotFound"), t);
+            return new CNull(t);
         }
 
         public String getName() {
@@ -92,7 +98,7 @@ public class CHPlotMe {
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class get_plots extends AbstractFunction {
+    public static class plot_list extends AbstractFunction {
         
         public Exceptions.ExceptionType[] thrown() {
             return null;
@@ -142,7 +148,7 @@ public class CHPlotMe {
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_loc extends AbstractFunction {
+    public static class plotid_at_loc extends AbstractFunction {
         
         public Exceptions.ExceptionType[] thrown() {
             return null;
@@ -192,6 +198,195 @@ public class CHPlotMe {
         }
         
         public CHVersion since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_info extends AbstractFunction {
+
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public Boolean runAsync() {
+            return false;
+        }
+
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String id = args[0].val();
+            String world = args[1].val();
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+            }
+            
+            Plot plot = PlotManager.getPlotById(world, id);
+            
+            if (plot == null) {
+                return new CNull(t);
+            }
+            
+            CArray retn = new CArray(t);
+            
+            retn.set("id", plot.id);
+            retn.set("world", plot.world);
+            retn.set("owner", plot.getOwner());
+            
+            CArray allowed = new CArray(t);
+            for (String allow : plot.allowed()) {
+                allowed.push(new CString(allow, t));
+            }
+            
+            retn.set("allowed", allowed, t);
+            
+            CArray denied = new CArray(t);
+            for (String deny : plot.denied()) {
+                allowed.push(new CString(deny, t));
+            }
+            
+            retn.set("denied", denied, t);
+            
+            retn.set("biome", plot.biome.name());
+            
+            retn.set("finished", new CBoolean(plot.finished, t), t);
+            retn.set("finishdate", plot.finisheddate);
+            
+            retn.set("forsale", new CBoolean(plot.forsale, t), t);
+            retn.set("currentbidder", plot.currentbidder);
+            retn.set("currentbid", new CDouble(plot.currentbid, t), t);
+            retn.set("customprice", new CDouble(plot.customprice, t), t);
+            
+            retn.set("protect", new CBoolean(plot.protect, t), t);
+            
+            return retn;
+        }
+
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{2};
+        }
+
+        public String docs() {
+            return "array {id} Return an array of information for a given plot id.";
+        }
+
+        public Version since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_world_info extends AbstractFunction {
+
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public Boolean runAsync() {
+            return false;
+        }
+
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String world = args[0].val();
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+            }
+            
+            CArray retn = new CArray(t);
+            
+            PlotMapInfo info = PlotManager.getMap(world);
+            
+            retn.set("plotsize", new CInt(info.PlotSize, t), t);
+            retn.set("pathwidth", new CInt(info.PathWidth, t), t);
+            
+            CArray plots = new CArray(t);
+            for (String plot : info.plots.keySet()) {
+                plots.push(new CString(plot, t));
+            }
+            
+            retn.set("plots", plots, t);
+            
+            return retn;
+        }
+
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{1};
+        }
+
+        public String docs() {
+            return "array {worldname} Return an array of PlotMe world information.";
+        }
+
+        public Version since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class player_plots extends AbstractFunction {
+
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public Boolean runAsync() {
+            return false;
+        }
+
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String world = args[0].val();
+            String player = args[1].val();
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+            }
+            
+            PlotMapInfo info = PlotManager.getMap(world);
+            
+            CArray plots = new CArray(t);
+            for (Plot plot : info.plots.values()) {
+                if (player.equalsIgnoreCase(plot.owner)) {
+                    plots.push(new CString(plot.id, t));
+                }
+            }
+            
+            return plots;
+        }
+
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{2};
+        }
+
+        public String docs() {
+            return "array {worldname, player} Return an array of plots owned by a player in a given world.";
+        }
+
+        public Version since() {
             return CHVersion.V3_3_1;
         }
     }
