@@ -218,8 +218,8 @@ public class CHPlotMe {
         }
 
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
-            String id = args[0].val();
-            String world = args[1].val();
+            String id = args[1].val();
+            String world = args[0].val();
             
             if (!PlotManager.isPlotWorld(world)) {
                 throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
@@ -275,7 +275,7 @@ public class CHPlotMe {
         }
 
         public String docs() {
-            return "array {id} Return an array of information for a given plot id.";
+            return "array {world, id} Return an array of information for a given plot id.";
         }
 
         public Version since() {
