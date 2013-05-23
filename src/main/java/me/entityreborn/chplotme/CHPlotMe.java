@@ -19,7 +19,9 @@ import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCLocation;
 import com.laytonsmith.abstraction.MCPlayer;
 import com.laytonsmith.annotations.api;
+import com.laytonsmith.core.CHLog;
 import com.laytonsmith.core.CHVersion;
+import com.laytonsmith.core.LogLevel;
 import com.laytonsmith.core.ObjectGenerator;
 import com.laytonsmith.core.Static;
 import com.laytonsmith.core.constructs.CArray;
@@ -28,6 +30,7 @@ import com.laytonsmith.core.constructs.CDouble;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CNull;
 import com.laytonsmith.core.constructs.CString;
+import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.CommandHelperEnvironment;
@@ -40,7 +43,9 @@ import com.worldcretornica.plotme.PlotManager;
 import com.worldcretornica.plotme.PlotMapInfo;
 import com.worldcretornica.plotme.PlotMe;
 import java.util.HashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Biome;
 
 /**
  *
@@ -66,6 +71,10 @@ public class CHPlotMe {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String worldName = args[0].val();
             String id = args[1].val();
+            
+            if (!PlotManager.isValidId(id)) {
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_owner", t);
+            }
             
             if (!PlotManager.isPlotWorld(worldName)) {
                 throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
@@ -221,6 +230,10 @@ public class CHPlotMe {
             String id = args[1].val();
             String world = args[0].val();
             
+            if (!PlotManager.isValidId(id)) {
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_info", t);
+            }
+            
             if (!PlotManager.isPlotWorld(world)) {
                 throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
             }
@@ -276,6 +289,246 @@ public class CHPlotMe {
 
         public String docs() {
             return "array {world, id} Return an array of information for a given plot id.";
+        }
+
+        public Version since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class set_plot_info extends AbstractFunction {
+
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public Boolean runAsync() {
+            return false;
+        }
+
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String world = args[0].val();
+            String id = args[1].val();
+            Construct a = args[2];
+            
+            if (!PlotManager.isValidId(id)) {
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for set_plot_info", t);
+            }
+            
+            if (!(a instanceof CArray)) {
+                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", t);
+            }
+            
+            CArray array = (CArray)a;
+            
+            if (!array.inAssociativeMode()) {
+                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", t);
+            }
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+            }
+            
+            Plot plot = PlotManager.getPlotById(world, id);
+            
+            if (plot == null) {
+                return new CNull(t);
+            }
+            
+            for (String key : array.keySet()) {
+                Construct data = array.get(key);
+                
+                if (key.equalsIgnoreCase("owner")) {
+                    if (data instanceof CString) {
+                        plot.owner = data.val();
+                        plot.updateField("owner", data.val());
+                        PlotManager.setOwnerSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's owner arg expects a string!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("biome")) {
+                    if (data instanceof CString) {
+                        try {
+                            Biome biome = Biome.valueOf(data.val().toUpperCase());
+                            PlotManager.setBiome(Bukkit.getWorld(world), 
+                                    plot.id, plot, biome);
+                        } catch (IllegalArgumentException e) {
+                            CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's biome arg is invalid (" + data.val() + ")!", t);
+                        }
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's biome arg expects a string!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("finished")) {
+                    if (data instanceof CBoolean) {
+                        CBoolean bdata = (CBoolean)data;
+                        
+                        if (bdata.getBoolean()) {
+                            plot.setFinished();
+                        } else {
+                            plot.setUnfinished();
+                        }
+                        
+                        plot.updateField("finished", bdata.getBoolean());
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's finished arg expects a boolean!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("allowed")) {
+                    if (data instanceof CArray) {
+                        CArray adata = (CArray)data;
+                        
+                        plot.removeAllAllowed();
+                        
+                        for (String allow : adata.keySet()) {
+                            plot.addAllowed(allow);
+                        }
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's allowed arg expects an array!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("denied")) {
+                    if (data instanceof CArray) {
+                        CArray adata = (CArray)data;
+                        
+                        plot.removeAllDenied();
+                        
+                        for (String allow : adata.keySet()) {
+                            plot.addDenied(allow);
+                        }
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's denied arg expects an array!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("forsale")) {
+                    if (data instanceof CBoolean) {
+                        CBoolean bdata = (CBoolean)data;
+                        
+                        plot.forsale = bdata.getBoolean();
+                        plot.updateField("forsale", bdata.getBoolean());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's forsale arg expects a boolean!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("currentbidder")) {
+                    if (data instanceof CString) {
+                        plot.currentbidder = data.val();
+                        plot.updateField("currentbidder", data.val());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's currentbidder arg expects a string!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("currentbid")) {
+                    if (data instanceof CInt) {
+                        CInt idata = (CInt)data;
+                        plot.currentbid = idata.getInt();
+                        plot.updateField("currentbid", idata.getInt());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else if (data instanceof CDouble) {
+                        CDouble ddata = (CDouble)data;
+                        plot.currentbid = ddata.getDouble();
+                        plot.updateField("currentbid", ddata.getDouble());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else{
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's currentbid arg expects an integer or double!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("customprice")) {
+                    if (data instanceof CInt) {
+                        CInt idata = (CInt)data;
+                        plot.customprice = idata.getInt();
+                        plot.updateField("customprice", idata.getInt());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else if (data instanceof CDouble) {
+                        CDouble ddata = (CDouble)data;
+                        plot.customprice = ddata.getDouble();
+                        plot.updateField("customprice", ddata.getDouble());
+                        PlotManager.setSellSign(Bukkit.getWorld(world), plot);
+                        
+                        continue;
+                    } else{
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's currentbid arg expects an integer or double!", t);
+                    }
+                }
+                
+                if (key.equalsIgnoreCase("protect")) {
+                    if (data instanceof CBoolean) {
+                        CBoolean bdata = (CBoolean)data;
+                        
+                        plot.protect = bdata.getBoolean();
+                        plot.updateField("protect", bdata.getBoolean());
+                        
+                        continue;
+                    } else {
+                        CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "set_plot_info's forsale arg expects a boolean!", t);
+                    }
+                }
+                
+                CHLog.GetLogger().Log(CHLog.Tags.RUNTIME, LogLevel.WARNING, 
+                                "Unknown key '" + key + "' for set_plot_info, ignoring.", t);
+            }
+            
+            return new CVoid(t);
+        }
+
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public Integer[] numArgs() {
+            return new Integer[]{3};
+        }
+
+        public String docs() {
+            return "void {world, id, array} Set information for a given plot id."
+                    + " Almost anything returned by plot_info is settable.";
         }
 
         public Version since() {

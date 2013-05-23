@@ -3,6 +3,7 @@
 * [`plot_list`][plotlist]
 * [`plotid_at_loc`][plotidatloc]
 * [`plot_info`][plotinfo]
+* [`set_plot_info`][setplotinfo]
 * [`plot_world_info`][plotworldinfo]
 * [`player_plots`][playerplots]
 
@@ -40,7 +41,17 @@
 
 ---
 
-<a id="plotworldinfo"></a>`plot_world_info(@world)` - *Return an array of information for a given plot id.*
+<a id="setplotinfo"></a>`set_plot_info(@world, `[`@id`][id]`, @array)` - *Sets information for a given plot id.* 
+
+Almost anything returned by `plot_info` can be modified. *Experimental!*
+
+*Returns:* void
+
+[setplotinfo]: #setplotinfo
+
+---
+
+<a id="plotworldinfo"></a>`plot_world_info(@world)` - *Return an array of information for a given world.*
 
 *Returns:* [`@plotworldinfo`][pwinfo]
 
@@ -63,24 +74,24 @@
 
 * <a id="pinfo"></a>`plotinfo` - Assoc. Array - *Information about a given plot:*
 
-  * `id` - [`@id`][id]
-  * `world` - World this plot resides on.
-  * `owner` - Owning player's name.
-  * `allowed` - List of player names allowed to build on this plot, besides the owner.
-  * `denied` - List of player names not allowed to build on this plot.
-  * `biome` - Biome type for this plot.
-  * `finished` - Boolean value of if this plot is flagged as finished.
-  * `finisheddate` - Date the plot was finished on.
-  * `forsale` - Boolean value of if this plot is for sale.
-  * `currentbidder` - Playername of current bidder for this plot.
-  * `currentbid` - Current bidder's bid.
-  * `customprice` - Price for plot.
-  * `protect` - Whether this plot is protected.
+  * `id` - String - [`@id`][id]
+  * `world` - String - *World this plot resides on.*
+  * `owner` - String - *Owning player's name.*
+  * `allowed` - Array of String - *List of player names allowed to build on this plot, besides the owner.*
+  * `denied` - Array of String - *List of player names not allowed to build on this plot.*
+  * `biome` - String - *Biome type for this plot.*
+  * `finished` - Boolean - *If this plot is flagged as finished.*
+  * `finisheddate` - String - *Date the plot was finished on.*
+  * `forsale` - Boolean - *If this plot is for sale.*
+  * `currentbidder` - String - *Playername of current bidder for this plot.*
+  * `currentbid` - Integer - *Current bidder's bid.*
+  * `customprice` - Integer - *Price for plot.*
+  * `protect` - Boolean - *Whether this plot is protected.*
 [pinfo]: #pinfo
 
 * <a id="pwinfo"></a>`plotworldinfo` - Assoc. Array - *Information about a world:*
 
-  * `plotsize` - Dimention of plots.
-  * `pathwidth` - Width of paths between plots.
-  * `plots` - Array of plot ids for plots in this world.
+  * `plotsize` - Integer - *Dimention of plots.*
+  * `pathwidth` - Integer - *Width of paths between plots.*
+  * `plots` - Array of String - *Plot* [`@ids`][id] *for plots in this world.*
 [pwinfo]: #pwinfo
