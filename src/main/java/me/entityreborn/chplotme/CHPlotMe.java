@@ -38,6 +38,7 @@ import com.laytonsmith.core.environments.Environment;
 import com.laytonsmith.core.exceptions.ConfigRuntimeException;
 import com.laytonsmith.core.functions.AbstractFunction;
 import com.laytonsmith.core.functions.Exceptions;
+import com.laytonsmith.core.functions.Exceptions.ExceptionType;
 import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 import com.worldcretornica.plotme.PlotMapInfo;
@@ -73,11 +74,11 @@ public class CHPlotMe {
             String id = args[1].val();
             
             if (!PlotManager.isValidId(id)) {
-                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_owner", t);
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_owner", ExceptionType.RangeException, t);
             }
             
             if (!PlotManager.isPlotWorld(worldName)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             Plot plot = PlotManager.getPlotById(worldName, id);
@@ -125,7 +126,7 @@ public class CHPlotMe {
             String worldName = args[0].val();
             
             if (!PlotManager.isPlotWorld(worldName)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             HashMap<String, Plot> plots = PlotManager.getPlots(worldName);
@@ -231,11 +232,11 @@ public class CHPlotMe {
             String world = args[0].val();
             
             if (!PlotManager.isValidId(id)) {
-                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_info", t);
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_info", ExceptionType.RangeException, t);
             }
             
             if (!PlotManager.isPlotWorld(world)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             Plot plot = PlotManager.getPlotById(world, id);
@@ -317,21 +318,21 @@ public class CHPlotMe {
             Construct a = args[2];
             
             if (!PlotManager.isValidId(id)) {
-                throw new ConfigRuntimeException("Invalid id (" + id + ") for set_plot_info", t);
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for set_plot_info", ExceptionType.RangeException, t);
             }
             
             if (!(a instanceof CArray)) {
-                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", t);
+                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", ExceptionType.FormatException, t);
             }
             
             CArray array = (CArray)a;
             
             if (!array.inAssociativeMode()) {
-                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", t);
+                throw new ConfigRuntimeException("Arg 3 of set_plot_info must be an associative array", ExceptionType.FormatException, t);
             }
             
             if (!PlotManager.isPlotWorld(world)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             Plot plot = PlotManager.getPlotById(world, id);
@@ -555,7 +556,7 @@ public class CHPlotMe {
             String world = args[0].val();
             
             if (!PlotManager.isPlotWorld(world)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             CArray retn = new CArray(t);
@@ -612,7 +613,7 @@ public class CHPlotMe {
             String player = args[1].val();
             
             if (!PlotManager.isPlotWorld(world)) {
-                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), t);
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
             }
             
             PlotMapInfo info = PlotManager.getMap(world);
