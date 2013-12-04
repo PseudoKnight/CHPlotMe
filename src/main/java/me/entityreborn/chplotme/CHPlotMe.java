@@ -15,7 +15,6 @@
  */
 package me.entityreborn.chplotme;
 
-import com.laytonsmith.PureUtilities.Version;
 import com.laytonsmith.abstraction.MCLocation;
 import com.laytonsmith.abstraction.MCPlayer;
 import com.laytonsmith.annotations.api;
@@ -53,9 +52,7 @@ import org.bukkit.block.Biome;
  * @author Jason Unger <entityreborn@gmail.com>
  */
 public class CHPlotMe {
-
-    @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_owner extends AbstractFunction {
+    public static abstract class PlotFunc extends AbstractFunction {
 
         public Exceptions.ExceptionType[] thrown() {
             return null;
@@ -69,6 +66,17 @@ public class CHPlotMe {
             return false;
         }
 
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public CHVersion since() {
+            return CHVersion.V3_3_1;
+        }
+    }
+
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_owner extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String worldName = args[0].val();
             String id = args[1].val();
@@ -82,16 +90,12 @@ public class CHPlotMe {
             }
             
             Plot plot = PlotManager.getPlotById(worldName, id);
-
+            
             if (plot != null) {
                 return new CString(plot.getOwner(), t);
             }
 
             return new CNull(t);
-        }
-
-        public String getName() {
-            return getClass().getSimpleName();
         }
 
         public Integer[] numArgs() {
@@ -101,27 +105,10 @@ public class CHPlotMe {
         public String docs() {
             return "string {worldname, id} Returns the owner of the plot of `id` in `worldname`.";
         }
-
-        public CHVersion since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_list extends AbstractFunction {
-        
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-        
-        public boolean isRestricted() {
-            return true;
-        }
-        
-        public Boolean runAsync() {
-            return false;
-        }
-        
+    public static class plot_list extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String worldName = args[0].val();
             
@@ -140,10 +127,6 @@ public class CHPlotMe {
             return retn;
         }
         
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-        
         public Integer[] numArgs() {
             return new Integer[]{1};
         }
@@ -151,27 +134,10 @@ public class CHPlotMe {
         public String docs() {
             return "array {world} Get the plot ids for a given world.";
         }
-        
-        public CHVersion since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class plotid_at_loc extends AbstractFunction {
-        
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-        
-        public boolean isRestricted() {
-            return true;
-        }
-        
-        public Boolean runAsync() {
-            return false;
-        }
-        
+    public static class plotid_at_loc extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             MCLocation loc;
             
@@ -195,10 +161,6 @@ public class CHPlotMe {
             return new CString(id, t);
         }
         
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-        
         public Integer[] numArgs() {
             return new Integer[]{1};
         }
@@ -206,27 +168,10 @@ public class CHPlotMe {
         public String docs() {
             return "string {[location]} Get the plots id for a given location.";
         }
-        
-        public CHVersion since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_info extends AbstractFunction {
-
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public Boolean runAsync() {
-            return false;
-        }
-
+    public static class plot_info extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String id = args[1].val();
             String world = args[0].val();
@@ -279,11 +224,7 @@ public class CHPlotMe {
             
             return retn;
         }
-
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-
+        
         public Integer[] numArgs() {
             return new Integer[]{2};
         }
@@ -291,27 +232,10 @@ public class CHPlotMe {
         public String docs() {
             return "array {world, id} Return an array of information for a given plot id.";
         }
-
-        public Version since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class set_plot_info extends AbstractFunction {
-
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public Boolean runAsync() {
-            return false;
-        }
-
+    public static class set_plot_info extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String world = args[0].val();
             String id = args[1].val();
@@ -519,10 +443,6 @@ public class CHPlotMe {
             return new CVoid(t);
         }
 
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-
         public Integer[] numArgs() {
             return new Integer[]{3};
         }
@@ -531,27 +451,10 @@ public class CHPlotMe {
             return "void {world, id, array} Set information for a given plot id."
                     + " Almost anything returned by plot_info is settable.";
         }
-
-        public Version since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_world_info extends AbstractFunction {
-
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public Boolean runAsync() {
-            return false;
-        }
-
+    public static class plot_world_info extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String world = args[0].val();
             
@@ -576,10 +479,6 @@ public class CHPlotMe {
             return retn;
         }
 
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-
         public Integer[] numArgs() {
             return new Integer[]{1};
         }
@@ -587,27 +486,10 @@ public class CHPlotMe {
         public String docs() {
             return "array {worldname} Return an array of PlotMe world information.";
         }
-
-        public Version since() {
-            return CHVersion.V3_3_1;
-        }
     }
     
     @api(environments = {CommandHelperEnvironment.class})
-    public static class player_plots extends AbstractFunction {
-
-        public Exceptions.ExceptionType[] thrown() {
-            return null;
-        }
-
-        public boolean isRestricted() {
-            return true;
-        }
-
-        public Boolean runAsync() {
-            return false;
-        }
-
+    public static class player_plots extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String world = args[0].val();
             String player = args[1].val();
@@ -628,20 +510,12 @@ public class CHPlotMe {
             return plots;
         }
 
-        public String getName() {
-            return getClass().getSimpleName();
-        }
-
         public Integer[] numArgs() {
             return new Integer[]{2};
         }
 
         public String docs() {
             return "array {worldname, player} Return an array of plots owned by a player in a given world.";
-        }
-
-        public Version since() {
-            return CHVersion.V3_3_1;
         }
     }
 }
