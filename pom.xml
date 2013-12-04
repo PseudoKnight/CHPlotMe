@@ -34,11 +34,15 @@
     </scm>
   
     <repositories>
-        <!-- This is a dirty hack, as PlotMe isn't a maven project -->
         <repository>
-            <id>project.local</id>
-            <name>Project Repository</name>
-            <url>file:${project.basedir}/lib</url>
+            <id>plotme-repo</id>
+            <url>http://jenkins.hawkfalcon.com/plugin/repository/everything/</url>
+            <releases>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
         </repository>
         
         <repository>
@@ -53,14 +57,10 @@
     </repositories>
 
     <dependencies>
-        <!-- This is a dirty hack, as PlotMe isn't a maven project -->
         <dependency>
-            <groupId>PlotMe</groupId>
+            <groupId>com.worldcretornica</groupId>
             <artifactId>PlotMe</artifactId>
-            <version>0.13</version>
-            <scope>system</scope>
-            <optional>true</optional>
-            <systemPath>${project.basedir}/lib/PlotMe.jar</systemPath>
+            <version>0.13-SNAPSHOT</version>
         </dependency>
         
         <dependency>
