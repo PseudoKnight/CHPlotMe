@@ -42,9 +42,11 @@ import com.worldcretornica.plotme.Plot;
 import com.worldcretornica.plotme.PlotManager;
 import com.worldcretornica.plotme.PlotMapInfo;
 import com.worldcretornica.plotme.PlotMe;
+import com.worldcretornica.plotme.SqlManager;
 import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 
 /**
@@ -516,6 +518,83 @@ public class CHPlotMe {
 
         public String docs() {
             return "array {worldname, player} Return an array of plots owned by a player in a given world.";
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_clear extends PlotFunc {
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String id = args[1].val();
+            String world = args[0].val();
+            
+            if (!PlotManager.isValidId(id)) {
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_clear", ExceptionType.RangeException, t);
+            }
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
+            }
+            
+            Plot plot = PlotManager.getPlotById(world, id);
+            
+            if (plot == null) {
+                throw new ConfigRuntimeException("Unknown id (" + id + ") for plot_clear", ExceptionType.NotFoundException, t);
+            }
+            
+            PlotManager.clear(Bukkit.getWorld(world), plot);
+            
+            return new CVoid(t);
+        }
+        
+        public Integer[] numArgs() {
+            return new Integer[]{2};
+        }
+
+        public String docs() {
+            return "void {world, id} Clears a plot for a given world.";
+        }
+    }
+    
+    @api(environments = {CommandHelperEnvironment.class})
+    public static class plot_reset extends PlotFunc {
+        public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
+            String id = args[1].val();
+            String world = args[0].val();
+            
+            if (!PlotManager.isValidId(id)) {
+                throw new ConfigRuntimeException("Invalid id (" + id + ") for plot_reset", ExceptionType.RangeException, t);
+            }
+            
+            if (!PlotManager.isPlotWorld(world)) {
+                throw new ConfigRuntimeException(PlotMe.caption("MsgNotPlotWorld"), ExceptionType.InvalidWorldException, t);
+            }
+            
+            Plot plot = PlotManager.getPlotById(world, id);
+            
+            if (plot == null) {
+                throw new ConfigRuntimeException("Unknown id (" + id + ") for plot_reset", ExceptionType.NotFoundException, t);
+            }
+            
+            World w = Bukkit.getWorld(world);
+            
+            if(!PlotManager.isPlotAvailable(id, w)) {
+                PlotManager.getPlots(w).remove(id);
+            }
+            
+            PlotManager.clear(w, plot);
+            PlotManager.removeOwnerSign(w, id);
+            PlotManager.removeSellSign(w, id);
+            SqlManager.deletePlot(PlotManager.getIdX(id), PlotManager.getIdZ(id), w.getName().toLowerCase());
+            
+            return new CVoid(t);
+        }
+        
+        public Integer[] numArgs() {
+            return new Integer[]{2};
+        }
+
+        public String docs() {
+            return "void {world, id} Resets a plot for a given world.";
         }
     }
 }
