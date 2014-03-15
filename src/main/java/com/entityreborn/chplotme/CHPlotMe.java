@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package me.entityreborn.chplotme;
+package com.entityreborn.chplotme;
 
 import com.laytonsmith.abstraction.MCLocation;
 import com.laytonsmith.abstraction.MCPlayer;
@@ -77,8 +77,29 @@ public class CHPlotMe {
         }
     }
 
-    @api(environments = {CommandHelperEnvironment.class})
-    public static class plot_owner extends PlotFunc {
+    @api
+    public static class plot_owner extends AbstractFunction {
+        
+        public Exceptions.ExceptionType[] thrown() {
+            return null;
+        }
+
+        public boolean isRestricted() {
+            return true;
+        }
+
+        public Boolean runAsync() {
+            return false;
+        }
+
+        public String getName() {
+            return getClass().getSimpleName();
+        }
+
+        public CHVersion since() {
+            return CHVersion.V3_3_1;
+        }
+        
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String worldName = args[0].val();
             String id = args[1].val();
@@ -109,7 +130,7 @@ public class CHPlotMe {
         }
     }
     
-    @api(environments = {CommandHelperEnvironment.class})
+    @api
     public static class plot_list extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String worldName = args[0].val();
@@ -138,7 +159,7 @@ public class CHPlotMe {
         }
     }
     
-    @api(environments = {CommandHelperEnvironment.class})
+    @api
     public static class plotid_at_loc extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             MCLocation loc;
@@ -172,7 +193,7 @@ public class CHPlotMe {
         }
     }
     
-    @api(environments = {CommandHelperEnvironment.class})
+    @api
     public static class plot_info extends PlotFunc {
         public Construct exec(Target t, Environment environment, Construct... args) throws ConfigRuntimeException {
             String id = args[1].val();
@@ -267,7 +288,7 @@ public class CHPlotMe {
                 return new CNull(t);
             }
             
-            for (String key : array.keySet()) {
+            for (String key : array.stringKeySet()) {
                 Construct data = array.get(key);
                 
                 if (key.equalsIgnoreCase("owner")) {
@@ -326,8 +347,14 @@ public class CHPlotMe {
                         
                         plot.removeAllAllowed();
                         
-                        for (String allow : adata.keySet()) {
-                            plot.addAllowed(allow);
+                        if (adata.inAssociativeMode()) {
+                            for (String akey : adata.stringKeySet()) {
+                                plot.addAllowed(adata.get(akey).val());
+                            }
+                        } else {
+                            for (int index = 0; index < adata.size(); index++) {
+                                plot.addAllowed(adata.get(index).val());
+                            }
                         }
                         
                         continue;
@@ -343,8 +370,14 @@ public class CHPlotMe {
                         
                         plot.removeAllDenied();
                         
-                        for (String allow : adata.keySet()) {
-                            plot.addDenied(allow);
+                        if (adata.inAssociativeMode()) {
+                            for (String akey : adata.stringKeySet()) {
+                                plot.addDenied(adata.get(akey).val());
+                            }
+                        } else {
+                            for (int index = 0; index < adata.size(); index++) {
+                                plot.addDenied(adata.get(index).val());
+                            }
                         }
                         
                         continue;
