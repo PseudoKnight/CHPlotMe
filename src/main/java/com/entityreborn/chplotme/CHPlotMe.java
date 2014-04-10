@@ -29,7 +29,6 @@ import com.laytonsmith.core.constructs.CDouble;
 import com.laytonsmith.core.constructs.CInt;
 import com.laytonsmith.core.constructs.CNull;
 import com.laytonsmith.core.constructs.CString;
-import com.laytonsmith.core.constructs.CVoid;
 import com.laytonsmith.core.constructs.Construct;
 import com.laytonsmith.core.constructs.Target;
 import com.laytonsmith.core.environments.CommandHelperEnvironment;
@@ -118,7 +117,7 @@ public class CHPlotMe {
                 return new CString(plot.getOwner(), t);
             }
 
-            return new CNull(t);
+            return CNull.NULL;
         }
 
         public Integer[] numArgs() {
@@ -210,7 +209,7 @@ public class CHPlotMe {
             Plot plot = PlotManager.getPlotById(world, id);
             
             if (plot == null) {
-                return new CNull(t);
+                return CNull.NULL;
             }
             
             CArray retn = new CArray(t);
@@ -285,7 +284,7 @@ public class CHPlotMe {
             Plot plot = PlotManager.getPlotById(world, id);
             
             if (plot == null) {
-                return new CNull(t);
+                return CNull.NULL;
             }
             
             for (String key : array.stringKeySet()) {
@@ -475,7 +474,7 @@ public class CHPlotMe {
                                 "Unknown key '" + key + "' for set_plot_info, ignoring.", t);
             }
             
-            return new CVoid(t);
+            return CNull.NULL;
         }
 
         public Integer[] numArgs() {
@@ -576,7 +575,7 @@ public class CHPlotMe {
             
             PlotManager.clear(Bukkit.getWorld(world), plot);
             
-            return new CVoid(t);
+            return CNull.NULL;
         }
         
         public Integer[] numArgs() {
@@ -619,7 +618,7 @@ public class CHPlotMe {
             PlotManager.removeSellSign(w, id);
             SqlManager.deletePlot(PlotManager.getIdX(id), PlotManager.getIdZ(id), w.getName().toLowerCase());
             
-            return new CVoid(t);
+            return CNull.NULL;
         }
         
         public Integer[] numArgs() {
