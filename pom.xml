@@ -36,7 +36,7 @@
     <repositories>
         <repository>
             <id>plotme-repo</id>
-            <url>http://jenkins.hawkfalcon.com/plugin/repository/everything/</url>
+            <url>https://github.com/ZachBora/PlotMe/</url>
             <releases>
                 <updatePolicy>always</updatePolicy>
             </releases>
