@@ -36,7 +36,7 @@
     <repositories>
         <repository>
             <id>plotme-repo</id>
-            <url>http://jenkins.hawkfalcon.com/plugin/repository/everything/</url>
+            <url>https://github.com/ZachBora/PlotMe/</url>
             <releases>
                 <updatePolicy>always</updatePolicy>
             </releases>
@@ -52,7 +52,7 @@
         
         <repository>
             <id>zml2008</id>
-            <url>http://files.zachsthings.com/repo/</url>
+            <url>https://github.com/zml2008/zml2008.github.io/</url>
         </repository>
     </repositories>
 

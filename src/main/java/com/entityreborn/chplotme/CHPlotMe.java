@@ -234,15 +234,15 @@ public class CHPlotMe {
             
             retn.set("biome", plot.biome.name());
             
-            retn.set("finished", new CBoolean(plot.finished, t), t);
+            retn.set("finished", CBoolean.get(plot.finished), t);
             retn.set("finishdate", plot.finisheddate);
             
-            retn.set("forsale", new CBoolean(plot.forsale, t), t);
+            retn.set("forsale", CBoolean.get(plot.forsale), t);
             retn.set("currentbidder", plot.currentbidder);
             retn.set("currentbid", new CDouble(plot.currentbid, t), t);
             retn.set("customprice", new CDouble(plot.customprice, t), t);
             
-            retn.set("protect", new CBoolean(plot.protect, t), t);
+            retn.set("protect", CBoolean.get(plot.protect), t);
             
             return retn;
         }
@@ -288,7 +288,7 @@ public class CHPlotMe {
             }
             
             for (String key : array.stringKeySet()) {
-                Construct data = array.get(key);
+                Construct data = array.get( key, t );
                 
                 if (key.equalsIgnoreCase("owner")) {
                     if (data instanceof CString) {
@@ -348,11 +348,11 @@ public class CHPlotMe {
                         
                         if (adata.inAssociativeMode()) {
                             for (String akey : adata.stringKeySet()) {
-                                plot.addAllowed(adata.get(akey).val());
+                                plot.addAllowed(adata.get(akey,t).val());
                             }
                         } else {
                             for (int index = 0; index < adata.size(); index++) {
-                                plot.addAllowed(adata.get(index).val());
+                                plot.addAllowed(adata.get(index,t).val());
                             }
                         }
                         
@@ -371,11 +371,11 @@ public class CHPlotMe {
                         
                         if (adata.inAssociativeMode()) {
                             for (String akey : adata.stringKeySet()) {
-                                plot.addDenied(adata.get(akey).val());
+                                plot.addDenied(adata.get(akey,t).val());
                             }
                         } else {
                             for (int index = 0; index < adata.size(); index++) {
-                                plot.addDenied(adata.get(index).val());
+                                plot.addDenied(adata.get(index,t).val());
                             }
                         }
                         
