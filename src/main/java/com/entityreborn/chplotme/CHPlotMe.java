@@ -234,15 +234,15 @@ public class CHPlotMe {
             
             retn.set("biome", plot.biome.name());
             
-            retn.set("finished", new CBoolean(plot.finished, t), t);
+            retn.set("finished", new CBoolean.get(plot.finished), t);
             retn.set("finishdate", plot.finisheddate);
             
-            retn.set("forsale", new CBoolean(plot.forsale, t), t);
+            retn.set("forsale", new CBoolean.get(plot.forsale), t);
             retn.set("currentbidder", plot.currentbidder);
             retn.set("currentbid", new CDouble(plot.currentbid, t), t);
             retn.set("customprice", new CDouble(plot.customprice, t), t);
             
-            retn.set("protect", new CBoolean(plot.protect, t), t);
+            retn.set("protect", new CBoolean.get(plot.protect), t);
             
             return retn;
         }
