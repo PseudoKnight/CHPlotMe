@@ -371,11 +371,11 @@ public class CHPlotMe {
                         
                         if (adata.inAssociativeMode()) {
                             for (String akey : adata.stringKeySet()) {
-                                plot.addDenied(adata.get(akey).val());
+                                plot.addDenied(adata.get(akey,t).val());
                             }
                         } else {
                             for (int index = 0; index < adata.size(); index++) {
-                                plot.addDenied(adata.get(index).val());
+                                plot.addDenied(adata.get(index,t).val());
                             }
                         }
                         
