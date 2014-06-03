@@ -352,7 +352,7 @@ public class CHPlotMe {
                             }
                         } else {
                             for (int index = 0; index < adata.size(); index++) {
-                                plot.addAllowed(adata.get(index).val());
+                                plot.addAllowed(adata.get(index,t).val());
                             }
                         }
                         
