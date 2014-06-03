@@ -288,7 +288,7 @@ public class CHPlotMe {
             }
             
             for (String key : array.stringKeySet()) {
-                Construct data = array.get(key);
+                Construct data = array.get( key, t );
                 
                 if (key.equalsIgnoreCase("owner")) {
                     if (data instanceof CString) {
