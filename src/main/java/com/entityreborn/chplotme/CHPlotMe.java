@@ -348,7 +348,7 @@ public class CHPlotMe {
                         
                         if (adata.inAssociativeMode()) {
                             for (String akey : adata.stringKeySet()) {
-                                plot.addAllowed(adata.get(akey).val());
+                                plot.addAllowed(adata.get(akey,t).val());
                             }
                         } else {
                             for (int index = 0; index < adata.size(); index++) {
