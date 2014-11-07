@@ -218,12 +218,16 @@ public class CHPlotMe {
             retn.set("world", plot.world);
             retn.set("owner", plot.getOwner());
             
+            CArray allowed = new CArray(t);
+            
             String allow = plot.getAllowed();
             String[] _allowsplit = allow.split(", ");
             for (String _allowarray : _allowsplit) {
             	allowed.push(new CString(_allowarray, t));
             }
             retn.set("allowed", allowed, t);
+            
+            CArray denied = new CArray(t);
             
             String deny = plot.getDenied();
             String[] _denysplit = deny.split(", ");
