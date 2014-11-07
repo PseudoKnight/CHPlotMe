@@ -218,18 +218,18 @@ public class CHPlotMe {
             retn.set("world", plot.world);
             retn.set("owner", plot.getOwner());
             
-            CArray allowed = new CArray(t);
-            for (String allow : plot.allowed()) {
-                allowed.push(new CString(allow, t));
+            String allow = plot.getAllowed();
+            String[] _allowsplit = allow.split(", ");
+            for (String _allowarray : _allowsplit) {
+            	allowed.push(new CString(_allowarray, t));
             }
-            
             retn.set("allowed", allowed, t);
             
-            CArray denied = new CArray(t);
-            for (String deny : plot.denied()) {
-                allowed.push(new CString(deny, t));
+            String deny = plot.getDenied();
+            String[] _denysplit = deny.split(", ");
+            for (String _denyarray : _denysplit) {
+            	denied.push(new CString(_denyarray, t));
             }
-            
             retn.set("denied", denied, t);
             
             retn.set("biome", plot.biome.name());
