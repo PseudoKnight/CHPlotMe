@@ -5,15 +5,6 @@
     <groupId>com.entityreborn</groupId>
     <artifactId>CHPlotMe</artifactId>
     <version>0.0.2-SNAPSHOT</version>
-    <packaging>jar</packaging>
-
-    <name>CHPlotMe</name>
-    <url>http://maven.apache.org</url>
-    
-    <ciManagement>
-        <system>hudson</system>
-        <url>http://ci.nixium.com/job/CHPlotMe/</url>
-    </ciManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -26,41 +17,19 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    
-    <scm>
-        <connection>scm:git:git://github.com:EntityReborn/CHPlotMe.git</connection>
-        <url>https://github.com/EntityReborn/CHPlotMe</url>
-        <developerConnection>scm:git:git@github.com:EntityReborn/CHPlotMe.git</developerConnection>
-    </scm>
-  
+
     <repositories>
-        <repository>
-            <id>plotme-repo</id>
-            <url>https://github.com/ZachBora/PlotMe/</url>
-            <releases>
-                <updatePolicy>always</updatePolicy>
-            </releases>
-            <snapshots>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        
         <repository>
             <id>sk89q-mvn2</id>
             <url>http://mvn2.sk89q.com/repo</url>
-        </repository>
-        
-        <repository>
-            <id>zml2008</id>
-            <url>https://github.com/zml2008/zml2008.github.io/</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>com.worldcretornica</groupId>
+            <groupId>com.worldcretornicaPlotMe</groupId>
             <artifactId>PlotMe</artifactId>
-            <version>0.13-SNAPSHOT</version>
+            <version>0.13g-SNAPSHOT</version>
         </dependency>
         
         <dependency>
